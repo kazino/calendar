@@ -5,6 +5,13 @@ namespace Calendar;
 
 class Events
 {
+    private $pdo;
+
+    public function __construct(\PDO $pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
     /**
      * Permet de récupèrer les évènements commencent entre 2 dates
      * @param \DateTime $start
@@ -12,17 +19,8 @@ class Events
      * @return array
      */
     public function getEventsBetween (\DateTime $start, \DateTime $end): array{
-        try{
-            $pdo = new \PDO('mysql:host=localhost;port=3306;dbname=tutocalendar','root', 'root',
-                [
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
-                ]);
-        } catch (\PDOException $e) {
-            print "Erreur : " . $e->getMessage() . "<br/>";
-        }
         $sql = "SELECT * FROM events WHERE start BETWEEN '{$start->format('Y-m-d 00:00:00')}' AND '{$end->format('Y-m-d 23:59:59')}'";
-        $statement = $pdo->query($sql);
+        $statement = $this->pdo->query($sql);
         $results = $statement->fetchAll();
         return $results;
     }
@@ -46,4 +44,22 @@ class Events
         }
         return $days;
     }
+
+    /**
+     * Récupère un évènement
+     * @param int $id
+     * @return Event
+     * @throws \Exception
+     */
+    public function find (int $id): Event {
+        $statement = $this->pdo->query("SELECT * FROM events WHERE id = $id LIMIT 1");
+         $statement->setFetchMode(\PDO::FETCH_CLASS, Event::class);
+         $result = $statement->fetch();
+         if($result === false){
+             throw new \Exception("Aucun résultat n'a été trouvé");
+         }else {
+             return $result;
+         }
+    }
+
 }

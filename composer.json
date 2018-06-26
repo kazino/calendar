@@ -1,0 +1,15 @@
+{
+    "name": "formation/www",
+    "authors": [
+        {
+            "name": "Zak",
+            "email": "ton@email.tld"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "Calendar\\": "src/Calendar"
+        }
+    },
+    "require": {}
+}

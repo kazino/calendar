@@ -1,35 +1,19 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <title>Calendar</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/calendar.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-</head>
-<body>
-<nav class="navbar navbar-dark bg-primary mb-3">
-    <a href="../public/index.php" class="navbar-brand">Mon Calendrier</a>
-</nav>
-
 <?php
-require '../src/Calendar/Month.php';
-require '../src/Calendar/Events.php';
+require '../src/bootstrap.php';
 
-$events = new Calendar\Events();
-try{
-    $month = new Calendar\Month($_GET['month' ] ?? null, $_GET['year'] ?? null);
-}catch (\Exception $e){
-    $month = new Calendar\Month();
-}
+use Calendar\Events;
+use Calendar\Month;
+
+
+$pdo = get_pdo();
+$events = new Events($pdo);
+$month = new Month($_GET['month' ] ?? null, $_GET['year'] ?? null);
 $start = $month->getStartingDay()->modify('last monday');
 $start = $start->format('N') === '1' ? $start : $month->getStartingDay()->modify('last monday');
 $weeks = $month->getWeeks();
 $end = (clone $start)->modify('+' . (6 + 7 * ($weeks - 1)) . ' days');
 $events = $events->getEventsBetweenByDay($start, $end);
-/*echo '<pre>';
-print_r($events);
-echo '</pre>';*/
+require '../views/header.php';
 ?>
 
 <div class="d-flex flex-row align-items-center justify-content-between mx-sm-3">
@@ -55,7 +39,7 @@ echo '</pre>';*/
                 <div class="calendar__day"><?= $date->format('d'); ?></div>
                 <?php foreach ($eventsForDay as $event): ?>
                     <div class="calendar__event">
-                        <?= (new DateTime($event['start']))->format('H:i');?> - <?= $event['name'];?>
+                        <?= (new DateTime($event['start']))->format('H:i');?> - <a href="event.php?id=<?= $event['id'];?>"><?= $event['name'];?></a>
                     </div>
                 <?php endforeach; ?>
             </td>
@@ -63,6 +47,4 @@ echo '</pre>';*/
         </tr>
     <?php endfor; ?>
 </table>
-
-</body>
-</html>
+<?php require '../views/footer.php'; ?>
