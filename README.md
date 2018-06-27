@@ -6,11 +6,20 @@
 
 - Export your calendar in format csv
 
-
 # Database
 
-  - Name : tutocalendar
+  CREATE DATABASE tutocalendar;
+
+  CREATE TABLE events
+  (
+    id          int auto_increment primary key,
+    name        varchar(255) not null,
+    description varchar(255) not null,
+    start       datetime     null,
+    end         datetime     null
+  );
   
-  - Table : events
-  
-  - Fields : id, name, description, start, end
+
+# Composer 
+
+composer install
